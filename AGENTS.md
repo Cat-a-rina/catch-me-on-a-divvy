@@ -76,6 +76,10 @@ this app needs for the two core features.
   planning) don't require logging where someone has actually ridden or
   storing GPS trails — just what they've chosen to save for later. Don't add
   a trip-history table unless a feature explicitly needs it.
+- Whether someone has completed onboarding is identity-adjacent, not app
+  data — it's stored in Clerk's `publicMetadata.onboarded` (set via a Server
+  Action calling `clerkClient().users.updateUserMetadata`), not a Supabase
+  column. No `onboarded` column was added to any table for this.
 
 ## Data model (2 tables)
 
@@ -121,3 +125,13 @@ operations, scoped `to authenticated`. This requires the Clerk↔Supabase
 Third-Party Auth wiring (Clerk's "Connect with Supabase" page +
 Supabase's Authentication → Third-Party Auth → Clerk) to be set up first,
 otherwise `auth.jwt()` won't carry a trusted Clerk session.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
