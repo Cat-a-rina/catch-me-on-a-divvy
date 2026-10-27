@@ -1,3 +1,11 @@
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+---
+
 # Divvy Bike Explorer — Project Notes
 
 Read this file before building anything. If a feature needs a new table or
@@ -111,10 +119,13 @@ because we don't persist Divvy's station data ourselves. If a station gets
 renamed or removed upstream, we just show stale info rather than owning a
 sync problem.
 
-## Open assumption
+## Open assumption — now resolved
 
-Assumes some lightweight login (email-based is enough) so "come back to it
-later" persists across sessions/devices. If this ends up being a
-no-login/local-only tool instead, drop `users`/`user_id` and keep
-`saved_stations`/`saved_routes` keyed to a local device instead — flag that
-decision here before building if it changes.
+Auth is handled by **Clerk** (set up via `clerk init`). This resolves the
+earlier open question about login: "come back to it later" persists via
+Clerk-managed sessions. Note this likely means the `users` table above is
+redundant — Clerk already owns identity (email, account creation time,
+etc.), so `saved_stations`/`saved_routes` can probably just store Clerk's
+`user_id` directly as a plain string instead of pointing at a local `users`
+table. Not yet changed in the diagram above — flag before building if we
+want to drop `users` and go to 2 tables.
