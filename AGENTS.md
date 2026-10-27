@@ -77,28 +77,27 @@ this app needs for the two core features.
   storing GPS trails — just what they've chosen to save for later. Don't add
   a trip-history table unless a feature explicitly needs it.
 
-## Data model (3 tables)
+## Data model (2 tables)
+
+Auth is handled by **Clerk** (set up via `clerk init`). Clerk already owns
+identity (email, account creation time, etc.), so there's no local `users`
+table — `saved_stations` / `saved_routes` store Clerk's `user_id` (the JWT
+`sub` claim) directly as a plain string. Supabase trusts Clerk's session
+tokens via a Third-Party Auth integration (not the deprecated JWT-template
+approach), so RLS policies read the user id straight off `auth.jwt()`.
 
 ```mermaid
 erDiagram
-    users ||--o{ saved_stations : "favorites"
-    users ||--o{ saved_routes : "plans"
-
-    users {
-        string id PK
-        string email
-        datetime created_at
-    }
     saved_stations {
         string id PK
-        string user_id FK
+        string user_id "Clerk user id (JWT sub claim)"
         string station_id "Divvy GBFS id, not a local FK"
         string nickname
         datetime created_at
     }
     saved_routes {
         string id PK
-        string user_id FK
+        string user_id "Clerk user id (JWT sub claim)"
         string origin_station_id "Divvy GBFS id"
         string destination_station_id "Divvy GBFS id"
         string label
@@ -106,12 +105,10 @@ erDiagram
     }
 ```
 
-- **`users`** — one row per person. The only table *without* a `user_id`
-  column, since it's the table that defines `user_id` for everyone else.
 - **`saved_stations`** — a person's favorited stations. Every row belongs to
-  exactly one user via `user_id`.
+  exactly one Clerk user via `user_id`.
 - **`saved_routes`** — a person's saved origin → destination pairs. Every row
-  belongs to exactly one user via `user_id`.
+  belongs to exactly one Clerk user via `user_id`.
 
 `station_id` / `origin_station_id` / `destination_station_id` are plain
 strings copied from Divvy's live feed — not foreign keys into a local table,
@@ -119,13 +116,8 @@ because we don't persist Divvy's station data ourselves. If a station gets
 renamed or removed upstream, we just show stale info rather than owning a
 sync problem.
 
-## Open assumption — now resolved
-
-Auth is handled by **Clerk** (set up via `clerk init`). This resolves the
-earlier open question about login: "come back to it later" persists via
-Clerk-managed sessions. Note this likely means the `users` table above is
-redundant — Clerk already owns identity (email, account creation time,
-etc.), so `saved_stations`/`saved_routes` can probably just store Clerk's
-`user_id` directly as a plain string instead of pointing at a local `users`
-table. Not yet changed in the diagram above — flag before building if we
-want to drop `users` and go to 2 tables.
+RLS on both tables: `(select auth.jwt()->>'sub') = user_id` for all
+operations, scoped `to authenticated`. This requires the Clerk↔Supabase
+Third-Party Auth wiring (Clerk's "Connect with Supabase" page +
+Supabase's Authentication → Third-Party Auth → Clerk) to be set up first,
+otherwise `auth.jwt()` won't carry a trusted Clerk session.
