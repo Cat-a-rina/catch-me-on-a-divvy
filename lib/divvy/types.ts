@@ -6,6 +6,7 @@ export type Station = {
   capacity: number;
   bikesAvailable: number;
   ebikesAvailable: number;
+  scootersAvailable: number;
   docksAvailable: number;
   isRenting: boolean;
   isReturning: boolean;

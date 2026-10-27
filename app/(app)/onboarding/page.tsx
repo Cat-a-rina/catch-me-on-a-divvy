@@ -2,6 +2,9 @@ import { completeOnboarding } from "@/app/actions/onboarding";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
+// Reads per-request auth data to decide whether to redirect.
+export const instant = false;
+
 const FEATURES = [
   {
     title: "Find your nearest station",
@@ -53,7 +56,16 @@ export default async function OnboardingPage() {
         ))}
       </ul>
 
-      <form action={completeOnboarding}>
+      <form action={completeOnboarding} className="flex flex-col gap-3">
+        <label className="flex flex-col gap-1 text-sm font-medium">
+          What should we call you?
+          <input
+            name="name"
+            defaultValue={user?.firstName ?? ""}
+            placeholder="e.g. Cat"
+            className="rounded border border-divvy-blue/30 px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-divvy-blue"
+          />
+        </label>
         <button
           type="submit"
           className="font-heading w-full rounded-full bg-divvy-blue px-6 py-3 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-divvy-blue-dark"

@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "leaflet/dist/leaflet.css";
 
 :root {
   --background: #faf8f3;
@@ -9,6 +8,8 @@
   --divvy-blue-light: #e8f2fb;
   --divvy-green: #2f7d4f;
   --divvy-green-light: #e7f3ec;
+  --divvy-amber: #b45309;
+  --divvy-amber-light: #fdf1e3;
 }
 
 @theme inline {
@@ -19,6 +20,8 @@
   --color-divvy-blue-light: var(--divvy-blue-light);
   --color-divvy-green: var(--divvy-green);
   --color-divvy-green-light: var(--divvy-green-light);
+  --color-divvy-amber: var(--divvy-amber);
+  --color-divvy-amber-light: var(--divvy-amber-light);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-barlow-condensed);

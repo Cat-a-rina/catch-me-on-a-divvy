@@ -2,6 +2,9 @@ import { StationBrowser } from "@/components/station-browser";
 import { getStations } from "@/lib/divvy/gbfs";
 import { getFavoriteStations } from "@/lib/supabase/queries";
 
+// Reads per-request Supabase data scoped to the signed-in user.
+export const instant = false;
+
 export default async function StationsPage() {
   const [stations, favorites] = await Promise.all([
     getStations(),
